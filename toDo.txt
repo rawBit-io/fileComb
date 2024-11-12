@@ -1,0 +1,1 @@
+- maybe move preview to the right side, so on small screens it is not hidden
