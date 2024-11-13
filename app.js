@@ -130,6 +130,18 @@ function isFileInExcludedFolder(file) {
   return false;
 }
 
+// Add this new function to check if a file matches the search pattern
+function matchesSearchPattern(fileName, searchPattern) {
+  // If search pattern starts with "*." then check file extension
+  if (searchPattern.startsWith("*.")) {
+    const searchExt = searchPattern.slice(2).toLowerCase();
+    return fileName.toLowerCase().endsWith(`.${searchExt}`);
+  }
+  // Otherwise do a regular text search
+  return fileName.toLowerCase().includes(searchPattern.toLowerCase());
+}
+
+// Update the createFileStructure function with the new search logic
 function createFileStructure() {
   fileStructure = {};
   files.forEach((file) => {
@@ -147,11 +159,8 @@ function createFileStructure() {
       if (i === pathParts.length - 1) {
         // It's a file
 
-        // Apply search filter
-        if (
-          searchTerm &&
-          !file.name.toLowerCase().includes(searchTerm.toLowerCase())
-        ) {
+        // Apply search filter with new pattern matching
+        if (searchTerm && !matchesSearchPattern(file.name, searchTerm)) {
           excludedFiles.add(file.webkitRelativePath);
           return;
         }
