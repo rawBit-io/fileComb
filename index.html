@@ -51,25 +51,28 @@
         <button id="deselectAllBtn" disabled>Deselect All</button>
       </div>
 
-      <div class="section file-list">
-        <h2>Files</h2>
-        <div id="fileList">No files to display</div>
+      <!-- Wrap Files and Preview Sections in a Flex Container -->
+      <div class="main-content">
+        <div class="section file-list">
+          <h2>Files</h2>
+          <div id="fileList">No files to display</div>
+        </div>
+
+        <div id="previewSection" class="section preview-section">
+          <div class="preview-header">
+            <h2>Preview</h2>
+            <div class="preview-buttons">
+              <button id="copyBtn" class="action-button" disabled>Copy</button>
+              <button id="saveBtn" class="action-button" disabled>Save</button>
+            </div>
+          </div>
+          <pre id="output">No content to display.</pre>
+        </div>
       </div>
 
       <div id="excludedFilesSection" class="section excluded-files hidden">
         <h2>Excluded Files</h2>
         <ul id="excludedFilesList"></ul>
-      </div>
-
-      <div id="previewSection" class="section preview-section hidden">
-        <div class="preview-header">
-          <h2>Preview</h2>
-          <div class="preview-buttons">
-            <button id="saveBtn" class="action-button" disabled>Save</button>
-            <button id="copyBtn" class="action-button" disabled>Copy</button>
-          </div>
-        </div>
-        <pre id="output"></pre>
       </div>
     </div>
 

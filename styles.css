@@ -9,7 +9,7 @@ body {
 }
 
 .container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 1rem auto;
   padding: 1rem 2rem;
 }
@@ -154,25 +154,78 @@ header h1 {
   cursor: not-allowed;
 }
 
-.file-list {
+/* Main Content Flex Container - Fixed for exact alignment */
+.main-content {
+  display: flex;
+  gap: 2rem;
   margin-bottom: 1rem;
+  min-height: 600px;
 }
 
-.file-list h2 {
-  margin-bottom: 0.5rem;
+/* File list and Preview sections - Exact matching sizes */
+.file-list,
+.preview-section {
+  width: calc(50% - 1rem);
+  min-width: calc(50% - 1rem);
+  max-width: calc(50% - 1rem);
+  flex: 0 0 calc(50% - 1rem); /* Prevent any growing/shrinking */
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  overflow: hidden; /* Ensure nothing pushes out */
+}
+
+/* Header alignment - Both sections */
+.file-list h2,
+.preview-header {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+  color: #f0f0f0;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+/* Preview header with consistent sizing and alignment */
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Ensure consistent heading size in preview */
+.preview-header h2 {
+  margin: 0;
   font-size: 1.2rem;
   color: #f0f0f0;
   font-weight: 400;
 }
 
-#fileList {
-  border: 1px solid #404040;
-  padding: 1rem;
-  max-height: 400px;
-  overflow-y: auto;
-  background: rgba(240, 240, 240, 0.02);
+.preview-buttons {
+  display: flex;
+  gap: 1rem;
+  height: 24px;
+  align-items: center;
 }
 
+/* Main content areas */
+#fileList,
+#output {
+  width: 100%;
+  height: calc(100% - 32px);
+  border: 1px solid #404040;
+  padding: 1rem;
+  background: rgba(240, 240, 240, 0.02);
+  overflow-y: auto;
+  overflow-x: auto; /* Allow horizontal scroll rather than width change */
+  margin: 0;
+  font-size: 1.1rem;
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Rest of the styles remain the same */
 .folder-item,
 .file-item {
   margin-left: 1.5rem;
@@ -264,29 +317,7 @@ header h1 {
   text-decoration: line-through;
 }
 
-.preview-section {
-  margin-top: 1rem;
-}
-
-.preview-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.preview-header h2 {
-  font-size: 1.2rem;
-  color: #f0f0f0;
-  font-weight: 400;
-}
-
-/* Adjusted styles for the preview buttons */
-.preview-buttons {
-  display: flex;
-  gap: 1rem;
-}
-
+/* Action buttons */
 .action-button {
   font-size: 1rem;
   color: #f0f0f0;
@@ -296,6 +327,8 @@ header h1 {
   transition: color 0.2s ease;
   font-family: inherit;
   padding: 0;
+  height: 24px;
+  line-height: 24px;
 }
 
 .action-button:hover:not(:disabled) {
@@ -309,17 +342,6 @@ header h1 {
 
 .action-button.copied {
   color: #808080;
-}
-
-#output {
-  font-family: inherit;
-  background: rgba(240, 240, 240, 0.02);
-  border: 1px solid #404040;
-  padding: 1.5rem;
-  max-height: 500px;
-  overflow-y: auto;
-  color: #f0f0f0;
-  font-size: 0.9rem;
 }
 
 #fileList::-webkit-scrollbar,
@@ -346,15 +368,22 @@ header h1 {
   background: #505050;
 }
 
-@media (max-width: 600px) {
-  .container {
-    padding: 1rem;
+@media (max-width: 800px) {
+  .main-content {
+    flex-direction: column;
+    min-height: auto;
   }
 
-  .actions button {
-    display: block;
+  .file-list,
+  .preview-section {
+    flex: none;
     width: 100%;
-    margin: 0.5rem 0;
+    height: 400px;
+  }
+
+  #fileList,
+  #output {
+    height: calc(100% - 32px);
   }
 }
 
@@ -423,4 +452,10 @@ input[type="text"] {
 
 .hidden {
   display: none;
+}
+
+/* Ensure preview content doesn't push out */
+#output {
+  word-wrap: break-word; /* Break long words */
+  white-space: pre-wrap; /* Preserve whitespace but wrap */
 }

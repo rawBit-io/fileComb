@@ -1,7 +1,0 @@
-Main Areas for Improvement:
-
-No drag-and-drop support
-Limited file preview features
-Could benefit from search functionality
-No syntax highlighting in preview
-Preview section could be repositioned for better visibility
