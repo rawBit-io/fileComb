@@ -1,1 +1,7 @@
-- maybe move preview to the right side, so on small screens it is not hidden
+Main Areas for Improvement:
+
+No drag-and-drop support
+Limited file preview features
+Could benefit from search functionality
+No syntax highlighting in preview
+Preview section could be repositioned for better visibility
