@@ -23,10 +23,23 @@
           hidden
         />
         <div id="stats" class="stats">No files selected</div>
+
+        <!-- Filter Section -->
         <div class="filter-section">
           <label>Max File Size (KB):</label>
           <input type="text" id="maxSizeInput" />
           <button id="applyFilterBtn">Apply Filter</button>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+          <label>Search Files:</label>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Enter search term..."
+          />
+          <button id="searchBtn">Search</button>
         </div>
       </div>
 
@@ -44,14 +57,17 @@
       </div>
 
       <div id="excludedFilesSection" class="section excluded-files hidden">
-        <h2>Excluded Files (Over Size Limit)</h2>
+        <h2>Excluded Files</h2>
         <ul id="excludedFilesList"></ul>
       </div>
 
       <div id="previewSection" class="section preview-section hidden">
         <div class="preview-header">
           <h2>Preview</h2>
-          <button id="copyBtn" class="copy-button" disabled>Copy</button>
+          <div class="preview-buttons">
+            <button id="saveBtn" class="action-button" disabled>Save</button>
+            <button id="copyBtn" class="action-button" disabled>Copy</button>
+          </div>
         </div>
         <pre id="output"></pre>
       </div>

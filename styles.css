@@ -54,6 +54,7 @@ header h1 {
   font-size: 0.9rem;
 }
 
+/* Filter Section */
 .filter-section {
   margin-top: 1rem;
   text-align: center;
@@ -87,6 +88,43 @@ header h1 {
 }
 
 .filter-section button:hover {
+  background: #333333;
+}
+
+/* Search Section */
+.search-section {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.search-section label {
+  margin-right: 0.5rem;
+}
+
+.search-section input[type="text"] {
+  width: 200px;
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+  background: #1a1a1a;
+  color: #f0f0f0;
+  border: 1px solid #404040;
+  outline: none;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.search-section button {
+  background: transparent;
+  color: #f0f0f0;
+  border: 1px solid #f0f0f0;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.search-section button:hover {
   background: #333333;
 }
 
@@ -243,8 +281,13 @@ header h1 {
   font-weight: 400;
 }
 
-/* Restyled Copy Button */
-.copy-button {
+/* Adjusted styles for the preview buttons */
+.preview-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.action-button {
   font-size: 1rem;
   color: #f0f0f0;
   background: none;
@@ -255,16 +298,16 @@ header h1 {
   padding: 0;
 }
 
-.copy-button:hover:not(:disabled) {
+.action-button:hover:not(:disabled) {
   color: #808080;
 }
 
-.copy-button:disabled {
+.action-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.copy-button.copied {
+.action-button.copied {
   color: #808080;
 }
 

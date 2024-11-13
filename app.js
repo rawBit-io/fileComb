@@ -11,10 +11,13 @@ const fileList = document.getElementById("fileList");
 const previewSection = document.getElementById("previewSection");
 const output = document.getElementById("output");
 const copyBtn = document.getElementById("copyBtn");
+const saveBtn = document.getElementById("saveBtn");
 const maxSizeInput = document.getElementById("maxSizeInput");
 const applyFilterBtn = document.getElementById("applyFilterBtn");
 const excludedFilesSection = document.getElementById("excludedFilesSection");
 const excludedFilesList = document.getElementById("excludedFilesList");
+const searchInput = document.getElementById("searchInput");
+const searchBtn = document.getElementById("searchBtn");
 
 // State Variables
 let files = [];
@@ -22,7 +25,8 @@ let fileMap = new Map();
 let fileStructure = {};
 let maxFileSize = Infinity; // in bytes
 let excludedFiles = new Set();
-let selectedFiles = new Set(); // Added to track selected files
+let selectedFiles = new Set();
+let searchTerm = "";
 
 // Excluded Folders
 const excludedFolders = new Set([
@@ -67,6 +71,7 @@ const allowedExtensions = new Set([
   "svg",
   "pdf",
   "py",
+  "ipynb", // Added ipynb here
 ]);
 
 // Utility Functions
@@ -141,6 +146,16 @@ function createFileStructure() {
 
       if (i === pathParts.length - 1) {
         // It's a file
+
+        // Apply search filter
+        if (
+          searchTerm &&
+          !file.name.toLowerCase().includes(searchTerm.toLowerCase())
+        ) {
+          excludedFiles.add(file.webkitRelativePath);
+          return;
+        }
+
         currentLevel[part] = {
           type: "file",
           file: file,
@@ -213,9 +228,12 @@ function renderFileStructure(structure, container) {
 
       renderFileStructure(item.children, folderContent);
 
-      folderItem.appendChild(folderHeader);
-      folderItem.appendChild(folderContent);
-      container.appendChild(folderItem);
+      // Only render folder if it has children
+      if (Object.keys(item.children).length > 0) {
+        folderItem.appendChild(folderHeader);
+        folderItem.appendChild(folderContent);
+        container.appendChild(folderItem);
+      }
     } else if (item.type === "file") {
       const fileItem = document.createElement("div");
       fileItem.classList.add("file-item");
@@ -318,6 +336,11 @@ function handleFileSelection(selectedFilesInput) {
   // Enable Load Selection button when files are loaded
   loadSelectionBtn.disabled = false;
 
+  applyFiltersAndRender(); // Apply filters and render the file list
+}
+
+function applyFiltersAndRender() {
+  excludedFiles.clear();
   createFileStructure();
 
   // Clear and re-render the file list
@@ -370,9 +393,10 @@ Relative Path: ${file.webkitRelativePath}
   output.textContent = combinedContent;
   previewSection.classList.remove("hidden");
 
-  // Enable the copy button when there is content
+  // Enable the copy and save buttons when there is content
   if (combinedContent.trim().length > 0) {
     copyBtn.disabled = false;
+    saveBtn.disabled = false;
   }
 }
 
@@ -380,13 +404,40 @@ function readFileAsText(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = function (e) {
-      resolve(e.target.result);
+      const ext = file.name.split(".").pop().toLowerCase();
+      if (ext === "ipynb") {
+        // Handle .ipynb files
+        try {
+          const notebook = JSON.parse(e.target.result);
+          let extractedText = extractNotebookContent(notebook);
+          resolve(extractedText);
+        } catch (error) {
+          console.error("Error parsing .ipynb file:", error);
+          reject(error);
+        }
+      } else {
+        resolve(e.target.result);
+      }
     };
     reader.onerror = function (e) {
       reject(e);
     };
     reader.readAsText(file);
   });
+}
+
+function extractNotebookContent(notebook) {
+  let content = "";
+  notebook.cells.forEach((cell, index) => {
+    if (cell.cell_type === "code") {
+      const cellSource = cell.source.join("");
+      content += `# Code Cell ${index + 1}\n${cellSource}\n\n`;
+    } else if (cell.cell_type === "markdown") {
+      const cellSource = cell.source.join("");
+      content += `# Markdown Cell ${index + 1}\n${cellSource}\n\n`;
+    }
+  });
+  return content;
 }
 
 function saveSelection() {
@@ -434,11 +485,7 @@ function loadSelection() {
         });
 
         // Re-render the file list to reflect the new selection
-        fileList.innerHTML = "";
-        renderFileStructure(fileStructure, fileList);
-
-        renderExcludedFiles();
-        updateStats();
+        applyFiltersAndRender();
       } catch (error) {
         console.error("Error loading selection:", error);
         alert("Invalid selection file format");
@@ -529,6 +576,20 @@ function copyToClipboard() {
   );
 }
 
+function saveToFile() {
+  const text = output.textContent;
+  const blob = new Blob([text], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "combined_files.txt"; // Set the default file name
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function applySizeFilter() {
   let sizeInKB;
   if (maxSizeInput.value.trim() === "") {
@@ -543,17 +604,12 @@ function applySizeFilter() {
 
   maxFileSize = sizeInKB * 1024; // Convert KB to bytes
 
-  createFileStructure(); // Recreate the file structure with the new maxFileSize
+  applyFiltersAndRender();
+}
 
-  // Clear the global 'excludedFiles' Set
-  excludedFiles.clear();
-
-  // Clear and re-render the file list
-  fileList.innerHTML = "";
-  renderFileStructure(fileStructure, fileList);
-
-  renderExcludedFiles();
-  updateStats();
+function applySearchFilter() {
+  searchTerm = searchInput.value.trim();
+  applyFiltersAndRender();
 }
 
 // Event Listeners
@@ -566,8 +622,9 @@ folderInput.addEventListener("change", (event) => {
 // Disable Load Selection button initially
 loadSelectionBtn.disabled = true;
 
-// Disable copy button initially
+// Disable copy and save buttons initially
 copyBtn.disabled = true;
+saveBtn.disabled = true;
 
 // Event Listeners
 combineBtn.addEventListener("click", combineFiles);
@@ -576,11 +633,20 @@ loadSelectionBtn.addEventListener("click", loadSelection);
 selectAllBtn.addEventListener("click", selectAllFiles);
 deselectAllBtn.addEventListener("click", deselectAllFiles);
 copyBtn.addEventListener("click", copyToClipboard);
+saveBtn.addEventListener("click", saveToFile);
 applyFilterBtn.addEventListener("click", applySizeFilter);
+searchBtn.addEventListener("click", applySearchFilter);
 
-// Apply filter on Enter key press
+// Apply size filter on Enter key press
 maxSizeInput.addEventListener("keypress", function (e) {
   if (e.key === "Enter") {
     applySizeFilter();
+  }
+});
+
+// Apply search filter on Enter key press
+searchInput.addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    applySearchFilter();
   }
 });
