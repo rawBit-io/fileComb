@@ -1,0 +1,461 @@
+/* Terminal Minimalist */
+body {
+  font-family: "JetBrains Mono", "SF Mono", monospace;
+  margin: 0;
+  padding: 0;
+  background: #1a1a1a;
+  color: #f0f0f0;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 1rem auto;
+  padding: 1rem 2rem;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+header h1 {
+  font-size: 2rem;
+  margin: 0;
+  color: #f0f0f0;
+  font-weight: 400;
+}
+
+.file-selection {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+#selectFolderBtn {
+  background: transparent;
+  color: #f0f0f0;
+  border: 1px solid #f0f0f0;
+  padding: 0.75rem 1.5rem;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.5px;
+}
+
+#selectFolderBtn:hover {
+  background: #f0f0f0;
+  color: #1a1a1a;
+}
+
+.stats {
+  margin-top: 1rem;
+  color: #808080;
+  font-size: 0.9rem;
+}
+
+/* Filter Section */
+.filter-section {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.filter-section label {
+  margin-right: 0.5rem;
+}
+
+.filter-section input[type="text"] {
+  width: 150px;
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+  background: #1a1a1a;
+  color: #f0f0f0;
+  border: 1px solid #404040;
+  outline: none;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.filter-section button {
+  background: transparent;
+  color: #f0f0f0;
+  border: 1px solid #f0f0f0;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-section button:hover {
+  background: #333333;
+}
+
+/* Search Section */
+.search-section {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.search-section label {
+  margin-right: 0.5rem;
+}
+
+.search-section input[type="text"] {
+  width: 200px;
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+  background: #1a1a1a;
+  color: #f0f0f0;
+  border: 1px solid #404040;
+  outline: none;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.search-section button {
+  background: transparent;
+  color: #f0f0f0;
+  border: 1px solid #f0f0f0;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.search-section button:hover {
+  background: #333333;
+}
+
+.actions {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.actions button {
+  background: transparent;
+  border: 1px solid #404040;
+  color: #f0f0f0;
+  padding: 0.5rem 1rem;
+  margin: 0.25rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actions button:hover:not(:disabled) {
+  border-color: #f0f0f0;
+}
+
+.actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Main Content Flex Container - Fixed for exact alignment */
+.main-content {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  min-height: 600px;
+}
+
+/* File list and Preview sections - Exact matching sizes */
+.file-list,
+.preview-section {
+  width: calc(50% - 1rem);
+  min-width: calc(50% - 1rem);
+  max-width: calc(50% - 1rem);
+  flex: 0 0 calc(50% - 1rem); /* Prevent any growing/shrinking */
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  overflow: hidden; /* Ensure nothing pushes out */
+}
+
+/* Header alignment - Both sections */
+.file-list h2,
+.preview-header {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+  color: #f0f0f0;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+/* Preview header with consistent sizing and alignment */
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Ensure consistent heading size in preview */
+.preview-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #f0f0f0;
+  font-weight: 400;
+}
+
+.preview-buttons {
+  display: flex;
+  gap: 1rem;
+  height: 24px;
+  align-items: center;
+}
+
+/* Main content areas */
+#fileList,
+#output {
+  width: 100%;
+  height: calc(100% - 32px);
+  border: 1px solid #404040;
+  padding: 1rem;
+  background: rgba(240, 240, 240, 0.02);
+  overflow-y: auto;
+  overflow-x: auto; /* Allow horizontal scroll rather than width change */
+  margin: 0;
+  font-size: 1.1rem;
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Rest of the styles remain the same */
+.folder-item,
+.file-item {
+  margin-left: 1.5rem;
+}
+
+.folder-header,
+.file-item {
+  display: flex;
+  align-items: center;
+  padding: 0.4rem 0;
+}
+
+.folder-header {
+  cursor: pointer;
+}
+
+.folder-header:hover,
+.file-item:hover {
+  background: rgba(240, 240, 240, 0.05);
+}
+
+.folder-header .expander {
+  margin-right: 0.75rem;
+  width: 1.5rem;
+  text-align: center;
+  color: #808080;
+  font-size: 1.1rem;
+}
+
+/* Custom checkbox styling */
+.folder-header input[type="checkbox"],
+.file-item input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #404040;
+  margin-right: 0.75rem;
+  cursor: pointer;
+  position: relative;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.folder-header input[type="checkbox"]:checked,
+.file-item input[type="checkbox"]:checked {
+  border-color: #f0f0f0;
+}
+
+.folder-header input[type="checkbox"]:checked::before,
+.file-item input[type="checkbox"]:checked::before {
+  content: "×";
+  position: absolute;
+  color: #f0f0f0;
+  font-size: 16px;
+  line-height: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.folder-header input[type="checkbox"]:hover,
+.file-item input[type="checkbox"]:hover {
+  border-color: #808080;
+}
+
+.folder-header span,
+.file-item span {
+  font-size: 1.1rem;
+  color: #f0f0f0;
+}
+
+.file-item input[type="checkbox"]:disabled + span {
+  color: #808080;
+  text-decoration: line-through;
+}
+
+.file-item input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  border-color: #404040;
+}
+
+.file-item input[type="checkbox"]:disabled:hover {
+  border-color: #404040;
+}
+
+.file-item .over-size-limit {
+  color: #808080;
+  text-decoration: line-through;
+}
+
+/* Action buttons */
+.action-button {
+  font-size: 1rem;
+  color: #f0f0f0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  font-family: inherit;
+  padding: 0;
+  height: 24px;
+  line-height: 24px;
+}
+
+.action-button:hover:not(:disabled) {
+  color: #808080;
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-button.copied {
+  color: #808080;
+}
+
+#fileList::-webkit-scrollbar,
+#output::-webkit-scrollbar,
+.excluded-files ul::-webkit-scrollbar {
+  width: 4px;
+}
+
+#fileList::-webkit-scrollbar-track,
+#output::-webkit-scrollbar-track,
+.excluded-files ul::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#fileList::-webkit-scrollbar-thumb,
+#output::-webkit-scrollbar-thumb,
+.excluded-files ul::-webkit-scrollbar-thumb {
+  background: #404040;
+}
+
+#fileList::-webkit-scrollbar-thumb:hover,
+#output::-webkit-scrollbar-thumb:hover,
+.excluded-files ul::-webkit-scrollbar-thumb:hover {
+  background: #505050;
+}
+
+@media (max-width: 800px) {
+  .main-content {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .file-list,
+  .preview-section {
+    flex: none;
+    width: 100%;
+    height: 400px;
+  }
+
+  #fileList,
+  #output {
+    height: calc(100% - 32px);
+  }
+}
+
+.folder-content {
+  display: block;
+  transition: all 0.2s ease;
+}
+
+.folder-content.collapsed {
+  display: none;
+}
+
+.folder-header .expander {
+  transition: color 0.2s ease;
+}
+
+.folder-header:hover .expander {
+  color: #f0f0f0;
+}
+
+/* Excluded Files Section */
+.excluded-files {
+  margin-top: 1rem;
+}
+
+.excluded-files h2 {
+  font-size: 1.2rem;
+  color: #f0f0f0;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+.excluded-files ul {
+  list-style: none;
+  padding: 1rem;
+  margin: 0;
+  background: rgba(240, 240, 240, 0.02);
+  border: 1px solid #404040;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.excluded-files li {
+  font-size: 1rem;
+  color: #808080;
+  text-decoration: line-through;
+  padding: 0.4rem 0;
+}
+
+.excluded-files li:hover {
+  background: rgba(240, 240, 240, 0.05);
+}
+
+/* Hide input arrows */
+input[type="text"]::-webkit-outer-spin-button,
+input[type="text"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="text"] {
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Ensure preview content doesn't push out */
+#output {
+  word-wrap: break-word; /* Break long words */
+  white-space: pre-wrap; /* Preserve whitespace but wrap */
+}

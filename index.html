@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Combiner</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>File Combiner</h1>
+      </header>
+
+      <div class="section file-selection">
+        <button id="selectFolderBtn">Select Folder</button>
+        <input
+          type="file"
+          id="folderInput"
+          webkitdirectory
+          directory
+          multiple
+          hidden
+        />
+        <div id="stats" class="stats">No files selected</div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+          <label>Max File Size (KB):</label>
+          <input type="text" id="maxSizeInput" />
+          <button id="applyFilterBtn">Apply Filter</button>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+          <label>Search Files:</label>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Enter search term..."
+          />
+          <button id="searchBtn">Search</button>
+        </div>
+      </div>
+
+      <div class="section actions">
+        <button id="combineBtn" disabled>Combine Files</button>
+        <button id="saveSelectionBtn" disabled>Save Selection</button>
+        <button id="loadSelectionBtn" disabled>Load Selection</button>
+        <button id="selectAllBtn" disabled>Select All</button>
+        <button id="deselectAllBtn" disabled>Deselect All</button>
+      </div>
+
+      <!-- Wrap Files and Preview Sections in a Flex Container -->
+      <div class="main-content">
+        <div class="section file-list">
+          <h2>Files</h2>
+          <div id="fileList">No files to display</div>
+        </div>
+
+        <div id="previewSection" class="section preview-section">
+          <div class="preview-header">
+            <h2>Preview</h2>
+            <div class="preview-buttons">
+              <button id="copyBtn" class="action-button" disabled>Copy</button>
+              <button id="saveBtn" class="action-button" disabled>Save</button>
+            </div>
+          </div>
+          <pre id="output">No content to display.</pre>
+        </div>
+      </div>
+
+      <div id="excludedFilesSection" class="section excluded-files hidden">
+        <h2>Excluded Files</h2>
+        <ul id="excludedFilesList"></ul>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
