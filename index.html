@@ -28,7 +28,29 @@
         <div class="filter-section">
           <label>Max File Size (KB):</label>
           <input type="text" id="maxSizeInput" />
-          <button id="applyFilterBtn">Apply Filter</button>
+          <div class="filter-actions">
+            <button id="applyFilterBtn" type="button">Apply Filter</button>
+            <button id="excludedFoldersTabBtn" type="button" class="tab-button">
+              Excluded Folders
+            </button>
+          </div>
+        </div>
+
+        <div id="excludedFoldersPanel" class="filter-panel hidden">
+          <div class="excluded-manager">
+            <p class="excluded-manager__hint">
+              Toggle which folders to skip when indexing files or add new ones.
+            </p>
+            <ul id="excludedFoldersManagerList" class="excluded-manager__list"></ul>
+            <div class="excluded-manager__add">
+              <input
+                type="text"
+                id="addExcludedInput"
+                placeholder="Folder name to exclude..."
+              />
+              <button id="addExcludedBtn" type="button">Add</button>
+            </div>
+          </div>
         </div>
 
         <!-- Search Section -->

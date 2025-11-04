@@ -14,6 +14,13 @@ const copyBtn = document.getElementById("copyBtn");
 const saveBtn = document.getElementById("saveBtn");
 const maxSizeInput = document.getElementById("maxSizeInput");
 const applyFilterBtn = document.getElementById("applyFilterBtn");
+const excludedFoldersTabBtn = document.getElementById("excludedFoldersTabBtn");
+const excludedFoldersPanel = document.getElementById("excludedFoldersPanel");
+const excludedFoldersManagerList = document.getElementById(
+  "excludedFoldersManagerList"
+);
+const addExcludedInput = document.getElementById("addExcludedInput");
+const addExcludedBtn = document.getElementById("addExcludedBtn");
 const excludedFilesSection = document.getElementById("excludedFilesSection");
 const excludedFilesList = document.getElementById("excludedFilesList");
 const searchInput = document.getElementById("searchInput");
@@ -28,8 +35,8 @@ let excludedFiles = new Set();
 let selectedFiles = new Set();
 let searchTerm = "";
 
-// Excluded Folders (same list as before)
-const excludedFolders = new Set([
+// Excluded folder configuration
+const defaultExcludedFolders = [
   "node_modules",
   ".git",
   ".svn",
@@ -50,7 +57,21 @@ const excludedFolders = new Set([
   "__pycache__",
   ".next",
   ".nuxt",
-]);
+];
+
+const excludedFolderState = new Map();
+
+defaultExcludedFolders.forEach((folderName) => {
+  const normalized = folderName.toLowerCase();
+  if (!excludedFolderState.has(normalized)) {
+    excludedFolderState.set(normalized, {
+      key: normalized,
+      name: folderName,
+      enabled: true,
+      source: "default",
+    });
+  }
+});
 
 // Allowed File Extensions
 const allowedExtensions = new Set([
@@ -71,6 +92,49 @@ const allowedExtensions = new Set([
   "svg",
   "py",
   "ipynb",
+  "sh",
+  "bash",
+  "zsh",
+  "ksh",
+  "fish",
+  "bat",
+  "cmd",
+  "ps1",
+  "psm1",
+  "lua",
+  "rb",
+  "php",
+  "dockerfile",
+  "dockerignore",
+  "env",
+  "ini",
+  "cfg",
+  "conf",
+  "properties",
+  "toml",
+  "lock",
+  "gradle",
+  "tf",
+  "tfvars",
+  "pl",
+  "c",
+  "h",
+  "cpp",
+  "hpp",
+  "cc",
+  "hh",
+  "cs",
+  "java",
+  "kt",
+  "swift",
+  "go",
+  "rs",
+  "csv",
+  "tsv",
+  "sql",
+  "log",
+  "tex",
+  "rst",
 ]);
 
 // --- NEW: path + directory fallbacks (non-visual) ---
@@ -129,22 +193,151 @@ function updateStats() {
 
 function isExcludedFolder(folderName) {
   const lowerName = folderName.toLowerCase();
-  return (
-    excludedFolders.has(lowerName) ||
-    lowerName.startsWith(".") ||
-    lowerName.endsWith("_modules") ||
-    lowerName.endsWith("_build")
-  );
+  const entry = excludedFolderState.get(lowerName);
+  return Boolean(entry && entry.enabled);
 }
 
-function isFileInExcludedFolder(file) {
-  const pathParts = getPath(file).split("/").filter(Boolean);
-  for (const part of pathParts.slice(0, -1)) {
-    if (isExcludedFolder(part)) {
-      return true;
-    }
+function getSortedExcludedFolderEntries(source) {
+  return Array.from(excludedFolderState.values())
+    .filter((entry) => entry.source === source)
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function renderExcludedFoldersManager() {
+  if (!excludedFoldersManagerList) return;
+
+  excludedFoldersManagerList.innerHTML = "";
+
+  const defaultEntries = getSortedExcludedFolderEntries("default");
+  const customEntries = getSortedExcludedFolderEntries("custom");
+
+  const addGroupHeader = (label) => {
+    const header = document.createElement("li");
+    header.textContent = label;
+    header.classList.add("excluded-manager__group");
+    excludedFoldersManagerList.appendChild(header);
+  };
+
+  if (defaultEntries.length > 0) {
+    addGroupHeader("Defaults");
+    defaultEntries.forEach((entry) => {
+      excludedFoldersManagerList.appendChild(
+        createExcludedFolderListItem(entry)
+      );
+    });
   }
-  return false;
+
+  if (customEntries.length > 0) {
+    addGroupHeader("Custom");
+    customEntries.forEach((entry) => {
+      excludedFoldersManagerList.appendChild(
+        createExcludedFolderListItem(entry)
+      );
+    });
+  }
+
+  if (excludedFoldersManagerList.children.length === 0) {
+    const emptyItem = document.createElement("li");
+    emptyItem.textContent = "No excluded folders configured.";
+    emptyItem.classList.add("excluded-manager__empty");
+    excludedFoldersManagerList.appendChild(emptyItem);
+  }
+}
+
+function createExcludedFolderListItem(entry) {
+  const listItem = document.createElement("li");
+  listItem.classList.add("excluded-manager__item");
+
+  const label = document.createElement("label");
+  label.classList.add("excluded-manager__label");
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = entry.enabled;
+  checkbox.dataset.key = entry.key;
+  checkbox.addEventListener("change", () => {
+    setExcludedFolderEnabled(entry.key, checkbox.checked);
+  });
+
+  const nameSpan = document.createElement("span");
+  nameSpan.textContent = entry.name;
+
+  label.appendChild(checkbox);
+  label.appendChild(nameSpan);
+
+  const badge = document.createElement("span");
+  badge.classList.add("excluded-manager__badge");
+  badge.textContent = entry.source === "default" ? "Default" : "Custom";
+  label.appendChild(badge);
+
+  listItem.appendChild(label);
+
+  if (entry.source === "custom") {
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.textContent = "Remove";
+    removeBtn.classList.add("excluded-manager__remove");
+    removeBtn.addEventListener("click", () => {
+      removeCustomExcludedFolder(entry.key);
+    });
+    listItem.appendChild(removeBtn);
+  }
+
+  return listItem;
+}
+
+function setExcludedFolderEnabled(key, enabled) {
+  const entry = excludedFolderState.get(key);
+  if (!entry || entry.enabled === enabled) return;
+  entry.enabled = enabled;
+  applyFiltersAndRender();
+}
+
+function removeCustomExcludedFolder(key) {
+  const entry = excludedFolderState.get(key);
+  if (!entry || entry.source !== "custom") {
+    return;
+  }
+  excludedFolderState.delete(key);
+  renderExcludedFoldersManager();
+  applyFiltersAndRender();
+}
+
+function addCustomExcludedFolderFromInput() {
+  if (!addExcludedInput) return;
+  const rawValue = addExcludedInput.value.trim();
+  if (!rawValue) {
+    return;
+  }
+
+  const key = rawValue.toLowerCase();
+  if (key.includes("/") || key.includes("\\")) {
+    alert("Please enter a single folder name, not a path.");
+    return;
+  }
+
+  const existing = excludedFolderState.get(key);
+  if (existing) {
+    existing.enabled = true;
+    if (!existing.name) {
+      existing.name = rawValue;
+    }
+    if (!existing.source) {
+      existing.source = "custom";
+    }
+  } else {
+    excludedFolderState.set(key, {
+      key,
+      name: rawValue,
+      enabled: true,
+      source: "custom",
+    });
+  }
+
+  addExcludedInput.value = "";
+  renderExcludedFoldersManager();
+  applyFiltersAndRender();
+  addExcludedInput.focus();
 }
 
 // Search pattern (unchanged look; added .ext and *.* convenience)
@@ -174,6 +367,7 @@ function createFileStructure() {
 
       // Exclude specified folders
       if (isExcludedFolder(part)) {
+        excludedFiles.add(path);
         return;
       }
 
@@ -342,7 +536,7 @@ function handleFileSelection(selectedFilesInput) {
   Array.from(selectedFilesInput).forEach((file) => {
     const ext = file.name.split(".").pop().toLowerCase();
 
-    if (allowedExtensions.has(ext) && !isFileInExcludedFolder(file)) {
+    if (allowedExtensions.has(ext)) {
       files.push(file);
       fileMap.set(getPath(file), file);
     }
@@ -694,6 +888,25 @@ saveBtn.addEventListener("click", saveToFile);
 applyFilterBtn.addEventListener("click", applySizeFilter);
 searchBtn.addEventListener("click", applySearchFilter);
 
+if (excludedFoldersTabBtn) {
+  excludedFoldersTabBtn.addEventListener("click", () => {
+    if (!excludedFoldersPanel) return;
+    const isHidden = excludedFoldersPanel.classList.contains("hidden");
+    if (isHidden) {
+      excludedFoldersPanel.classList.remove("hidden");
+      excludedFoldersTabBtn.classList.add("active");
+      renderExcludedFoldersManager();
+    } else {
+      excludedFoldersPanel.classList.add("hidden");
+      excludedFoldersTabBtn.classList.remove("active");
+    }
+  });
+}
+
+if (addExcludedBtn) {
+  addExcludedBtn.addEventListener("click", addCustomExcludedFolderFromInput);
+}
+
 // Apply size filter on Enter key press
 maxSizeInput.addEventListener("keypress", function (e) {
   if (e.key === "Enter") {
@@ -707,3 +920,11 @@ searchInput.addEventListener("keypress", function (e) {
     applySearchFilter();
   }
 });
+
+if (addExcludedInput) {
+  addExcludedInput.addEventListener("keypress", function (e) {
+    if (e.key === "Enter") {
+      addCustomExcludedFolderFromInput();
+    }
+  });
+}
