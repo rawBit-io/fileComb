@@ -593,8 +593,10 @@ function deselectAllFiles() {
 async function copyToClipboard() {
   const text = output.textContent;
   try {
+    let copied = false;
     if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(text);
+      copied = true;
     } else {
       const ta = document.createElement("textarea");
       ta.value = text;
@@ -603,8 +605,14 @@ async function copyToClipboard() {
       document.body.appendChild(ta);
       ta.focus();
       ta.select();
-      document.execCommand("copy");
+      copied = document.execCommand("copy");
       document.body.removeChild(ta);
+      if (!copied) {
+        throw new Error("document.execCommand('copy') returned false.");
+      }
+    }
+    if (!copied) {
+      throw new Error("Clipboard API unavailable.");
     }
     // Indicate success by changing the button text temporarily
     copyBtn.textContent = "Copied!";
@@ -665,6 +673,7 @@ enableDirectoryFallback(folderInput);
 
 folderInput.addEventListener("change", (event) => {
   handleFileSelection(event.target.files);
+  event.target.value = "";
 });
 
 // Disable Load Selection button initially
